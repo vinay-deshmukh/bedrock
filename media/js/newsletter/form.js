@@ -58,7 +58,7 @@ $(function () {
 
         var $self = $(this);
         var $errors = $('#footer-email-errors');
-        var $errorlist = $errors.find('ul.errorlist');
+        var $errorlist = $errors.find('ul.mzp-c-form-errors');
         var $submitbutton = $('#footer_email_submit');
         var $spinnerTarget = $('#newsletter-spinner');
         var spinnerColor = '#000'; // default to black
