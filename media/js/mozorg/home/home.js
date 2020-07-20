@@ -8,4 +8,7 @@
     // Lazyload images
     Mozilla.LazyLoad.init();
 
+    // TODO remove this is a test
+    wmyUndefinedFunction();
+
 })();
