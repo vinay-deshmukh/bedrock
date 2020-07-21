@@ -19,6 +19,8 @@ $image-path: "/media/protocol/img";
  * Pebbles specific overrides for download button in main navigation.
  */
 .mzp-c-navigation-download {
+    padding-top: 4px; //https://github.com/mozilla/protocol/issues/629
+
     .download-button {
         .download-link {
             background-color: transparent;
