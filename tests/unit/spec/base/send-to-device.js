@@ -83,10 +83,10 @@ describe('send-to-device.js', function() {
 
         it('should call bedrock geo to update the messaging', function() {
             // spyOn($, 'get').and.callFake(function () {
-            var self = this;
-            self.resetSpy = function(){
-                self.tempSpy.and.callThrough();
-            };
+            // var self = this;
+            // self.resetSpy = function(){
+            //     self.tempSpy.and.callThrough();
+            // };
             // self.tempSpy = 
             spyOn(window, 'fetch').and.callFake(function() {
                 var d = $.Deferred();
@@ -100,9 +100,6 @@ describe('send-to-device.js', function() {
 
                 return d.promise();
             });
-            spyOn(window, 'fetch');
-            // console.log(tempSpy.name);
-
 
             spyOn(form, 'updateMessaging').and.callThrough();
             form.init();

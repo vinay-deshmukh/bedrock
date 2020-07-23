@@ -60,7 +60,7 @@ if (typeof window.Mozilla === 'undefined') {
      * Initialise the form messaging and bind events.
      */
     SendToDevice.prototype.init = function() {
-        if (this.$widget.length === 1) {
+        if (this.$widget instanceof HTMLElement) {
             this.getLocation();
             this.bindEvents();
         }
@@ -90,8 +90,11 @@ if (typeof window.Mozilla === 'undefined') {
 
         // should /country-code.json be slow to load,
         // just show the email messaging after 5 seconds waiting.
+        console.log('timeout call');
         this.formTimeout = setTimeout(self.updateMessaging, 5000);
 
+        console.log('fetch call');
+        console.log(Promise.prototype.finally);
         window.fetch('/country-code.json')
             .then(function(data) {
                 if (data && data.country_code) {
@@ -102,7 +105,8 @@ if (typeof window.Mozilla === 'undefined') {
             .catch(function() {
                 // something went wrong, show only the email messaging.
                 self.updateMessaging();
-            }).finally(function() {
+            })
+            .finally(function() {
                 if (typeof self.geoCallback === 'function') {
                     self.geoCallback(SendToDevice.COUNTRY_CODE);
                 }
