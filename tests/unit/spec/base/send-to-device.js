@@ -82,7 +82,15 @@ describe('send-to-device.js', function() {
     describe('getLocation', function() {
 
         it('should call bedrock geo to update the messaging', function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            //     var d = $.Deferred();
+            //     var data = {
+            //         country_code: 'us'
+            //     };
+            //     d.resolve(data, 'success');
+            //     return d.promise();
+            // });
+            spyOn(window, 'fetch').and.callFake(function() {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'us'
@@ -90,9 +98,12 @@ describe('send-to-device.js', function() {
                 d.resolve(data, 'success');
                 return d.promise();
             });
+
+
             spyOn(form, 'updateMessaging').and.callThrough();
             form.init();
-            expect($.get).toHaveBeenCalledWith('/country-code.json');
+            // expect($.get).toHaveBeenCalledWith('/country-code.json');
+            expect(fetch).toHaveBeenCalledWith('/country-code.json');
             expect(form.updateMessaging).toHaveBeenCalled();
             expect(Mozilla.SendToDevice.COUNTRY_CODE).toEqual('us');
         });
@@ -101,7 +112,8 @@ describe('send-to-device.js', function() {
     describe('executeGeoCallback', function() {
 
         it('should execute the geoCallback function when provided', function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'fr'
@@ -117,7 +129,8 @@ describe('send-to-device.js', function() {
         });
 
         it('should execute the geoCallback function when geo lookup fails', function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 d.reject('error');
                 return d.promise();
@@ -133,7 +146,8 @@ describe('send-to-device.js', function() {
     describe('showSMS', function() {
 
         it('should call showSMS if users is inside the US', function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'us'
@@ -149,7 +163,8 @@ describe('send-to-device.js', function() {
         });
 
         it('should not call showSMS if users is outside a supported country', function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'de'
@@ -184,7 +199,8 @@ describe('send-to-device.js', function() {
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
-            spyOn($, 'get').and.callFake(function () {
+            // spyOn($, 'get').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'us'
@@ -196,7 +212,8 @@ describe('send-to-device.js', function() {
 
         it('should handle success', function() {
 
-            spyOn($, 'post').and.callFake(function () {
+            // spyOn($, 'post').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     'success': 'success'
@@ -209,13 +226,15 @@ describe('send-to-device.js', function() {
 
             form.init();
             $('.send-to-device-form').submit();
-            expect($.post).toHaveBeenCalled();
+            // expect($.post).toHaveBeenCalled();
+            expect(window.fetch).toHaveBeenCalled();
             expect(form.onFormSuccess).toHaveBeenCalledWith('success');
         });
 
         it('should handle error', function() {
 
-            spyOn($, 'post').and.callFake(function () {
+            // spyOn($, 'post').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     'errors': 'Please enter an email address.'
@@ -228,13 +247,15 @@ describe('send-to-device.js', function() {
 
             form.init();
             $('.send-to-device-form').submit();
-            expect($.post).toHaveBeenCalled();
+            // expect($.post).toHaveBeenCalled();
+            expect(window.fetch).toHaveBeenCalled();
             expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
         });
 
         it('should handle failure', function() {
 
-            spyOn($, 'post').and.callFake(function () {
+            // spyOn($, 'post').and.callFake(function () {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var error = 'An error occurred in our system. Please try again later.';
                 d.reject(error);
@@ -245,7 +266,8 @@ describe('send-to-device.js', function() {
 
             form.init();
             $('.send-to-device-form').submit();
-            expect($.post).toHaveBeenCalled();
+            // expect($.post).toHaveBeenCalled();
+            expect(window.fetch).toHaveBeenCalled();
             expect(form.onFormFailure).toHaveBeenCalledWith('An error occurred in our system. Please try again later.');
         });
     });
