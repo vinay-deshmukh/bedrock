@@ -28,9 +28,11 @@ if (typeof window.Mozilla === 'undefined') {
         this.$errorList = document.querySelector('.error-list');
         this.$spinnerTarget = document.querySelector('.loading-spinner');
         this.$footerLinks = document.querySelector('footer > ul');
-        this.$sendAnotherLink = document.querySelector('.send-another');
+
+        // Does not exist in test file
+        //this.$sendAnotherLink = document.querySelector('.send-another');
         this.$formHeading = document.querySelector('.form-heading');
-        //this.spinnerColor = this.$widget.data('spinnerColor') || '#000';
+
         this.spinnerColor = this.$widget.dataset.spinnerColor || '#000';
         this.countries = this.$widget.dataset.countries;
         console.log(this.countries);
@@ -97,20 +99,24 @@ if (typeof window.Mozilla === 'undefined') {
         console.log(Promise.prototype.finally);
         window.fetch('/country-code.json')
             .then(function(data) {
+                console.log('then begin');
                 if (data && data.country_code) {
                     SendToDevice.COUNTRY_CODE = data.country_code.toLowerCase();
                 }
                 self.updateMessaging();
+                console.log('then end');
             })
             .catch(function() {
                 // something went wrong, show only the email messaging.
                 self.updateMessaging();
-            })
-            .finally(function() {
-                if (typeof self.geoCallback === 'function') {
-                    self.geoCallback(SendToDevice.COUNTRY_CODE);
-                }
             });
+            // .finally(function() {
+            //     console.log('finally begin');
+            //     // if (typeof self.geoCallback === 'function') {
+            //     //     self.geoCallback(SendToDevice.COUNTRY_CODE);
+            //     // }
+            //     console.log('finally end');
+            // });
     };
 
     /**
@@ -118,6 +124,7 @@ if (typeof window.Mozilla === 'undefined') {
      */
     SendToDevice.prototype.inSupportedCountry = function() {
         var ccode = SendToDevice.COUNTRY_CODE;
+        console.log('Country code:' + SendToDevice.COUNTRY_CODE);
         return (ccode && this.countries.indexOf('|' + ccode + '|') !== -1);
     };
 
@@ -125,6 +132,8 @@ if (typeof window.Mozilla === 'undefined') {
      * Checks to update the form messaging based on the users location
      */
     SendToDevice.prototype.updateMessaging = function() {
+        console.log('updateMessaging start');
+        console.log('Country code:' + SendToDevice.COUNTRY_CODE);
         clearTimeout(this.formTimeout);
         if (!this.formLoaded) {
             this.formLoaded = true;
@@ -134,30 +143,37 @@ if (typeof window.Mozilla === 'undefined') {
                 this.showSMS();
             }
         }
+        console.log('updateMessaging end');
     };
 
     /**
      * Updates the form fields to include SMS messaging
      */
     SendToDevice.prototype.showSMS = function() {
-        var $label = this.$formFields.querySelector('.form-input-label');
+        console.log('showSMS begin');
+        // TODO: label doesnt have any data, and original selector used class instead
+        // of id
+        var $label = this.$formFields.querySelector('#form-input-label');
         this.$form.classList.add('sms-country');
+
+        // TODO: remove this?
         $label.innerHTML = $label.dataset.alt;
         this.$input.setAttribute('placeholder', this.$input.dataset.alt);
         this.smsEnabled = true;
+        console.log('showSMS end');
     };
 
     /**
      * Binds form submission and click events
      */
     SendToDevice.prototype.bindEvents = function() {
-        console.log('bindEvents');
+        console.log('bindEvents begin');
         // this.$form.on('submit', $.proxy(this.onFormSubmit, this));
         this.$form.addEventListener('submit', this.onFormSubmit.bind(this));
 
-        // this.$sendAnotherLink.on('click', $.proxy(this.sendAnother, this));
-        this.$sendAnotherLink.addEventListener('click', this.sendAnother.bind(this));
-
+        // TODO: test file does not have this
+        // this.$sendAnotherLink.addEventListener('click', this.sendAnother.bind(this));
+        console.log('bindEvents end');
     };
 
     /**

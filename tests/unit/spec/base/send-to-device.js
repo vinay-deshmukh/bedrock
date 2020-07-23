@@ -53,7 +53,7 @@ describe('send-to-device.js', function() {
         $('#send-to-device').remove();
         Mozilla.SendToDevice.COUNTRY_CODE = '';
     });
-/*
+    //works
     describe('instantiation', function() {
 
         it('should create a new instance of SendToDevice', function() {
@@ -66,6 +66,7 @@ describe('send-to-device.js', function() {
         });
     });
 
+    //works
     describe('inSupportedCountry', function() {
         it('should be true for countries in data-countries, and false for others', function() {
             Mozilla.SendToDevice.COUNTRY_CODE = 'de';
@@ -78,10 +79,11 @@ describe('send-to-device.js', function() {
             expect(form.inSupportedCountry()).toBeTruthy();
         });
     });
-*/
+
     describe('getLocation', function() {
 
         it('should call bedrock geo to update the messaging', function() {
+            console.log('getLocation test starts');
             // spyOn($, 'get').and.callFake(function () {
             // var self = this;
             // self.resetSpy = function(){
@@ -93,22 +95,33 @@ describe('send-to-device.js', function() {
                 var data = {
                     country_code: 'us'
                 };
-                d.resolve(data, 'success');
+                console.log('fake fetch returns');
+                d.resolve(data);//, 'success');
+                return d.promise();
+
+                // return Promise.resolve(data);
 
             //     // Remove callFake
                 // self.resetSpy();
 
-                return d.promise();
+                // return d.promise();
             });
 
             spyOn(form, 'updateMessaging').and.callThrough();
+            console.log('start form init');
+            
             form.init();
+            console.log('form init after');
+
             // spyOn($, 'get');
             // expect($.get).toHaveBeenCalledWith('/country-code.json');
-            expect(window.fetch).toHaveBeenCalled();
-            // expect(window.fetch).toHaveBeenCalledWith('/country-code.json');
+            expect(window.fetch).toHaveBeenCalledWith('/country-code.json');
+            console.log('fetch check done');
             expect(form.updateMessaging).toHaveBeenCalled();
+            console.log('test:' + Mozilla.SendToDevice.COUNTRY_CODE);
             expect(Mozilla.SendToDevice.COUNTRY_CODE).toEqual('us');
+
+
         });
     });
 /*
