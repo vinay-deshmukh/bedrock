@@ -53,7 +53,7 @@ describe('send-to-device.js', function() {
         $('#send-to-device').remove();
         Mozilla.SendToDevice.COUNTRY_CODE = '';
     });
-/*
+
     //works
     describe('instantiation', function() {
 
@@ -80,7 +80,7 @@ describe('send-to-device.js', function() {
             expect(form.inSupportedCountry()).toBeTruthy();
         });
     });
-*/
+
     describe('getLocation', function() {
 
         beforeEach(function() {
@@ -126,8 +126,16 @@ describe('send-to-device.js', function() {
             // jasmine.clock().uninstall();
         });
     });
-/*
+
     describe('executeGeoCallback', function() {
+
+        beforeEach(function() {
+            jasmine.clock().install();
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
 
         it('should execute the geoCallback function when provided', function() {
             // spyOn($, 'get').and.callFake(function () {
@@ -143,6 +151,9 @@ describe('send-to-device.js', function() {
             form.geoCallback = sinon.stub();
             spyOn(form, 'geoCallback').and.callThrough();
             form.init();
+
+            jasmine.clock().tick(6000);
+
             expect(form.geoCallback).toHaveBeenCalledWith('fr');
         });
 
@@ -157,11 +168,21 @@ describe('send-to-device.js', function() {
             form.geoCallback = sinon.stub();
             spyOn(form, 'geoCallback').and.callThrough();
             form.init();
+
+            jasmine.clock().tick(6000);
             expect(form.geoCallback).toHaveBeenCalledWith('');
         });
     });
 
     describe('showSMS', function() {
+
+        beforeEach(function() {
+            jasmine.clock().install();
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
 
         it('should call showSMS if users is inside the US', function() {
             // spyOn($, 'get').and.callFake(function () {
@@ -176,6 +197,7 @@ describe('send-to-device.js', function() {
 
             spyOn(form, 'showSMS').and.callThrough();
             form.init();
+            jasmine.clock().tick(6000);
             expect(form.showSMS).toHaveBeenCalled();
             expect($('.send-to-device-form').hasClass('sms-country')).toBeTruthy();
         });
@@ -193,6 +215,7 @@ describe('send-to-device.js', function() {
 
             spyOn(form, 'showSMS').and.callThrough();
             form.init();
+            jasmine.clock().tick(6000);
             expect(form.showSMS).not.toHaveBeenCalled();
         });
     });
@@ -213,7 +236,7 @@ describe('send-to-device.js', function() {
             expect(form.checkEmailValidity(false)).toBeFalsy();
         });
     });
-
+/*
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
