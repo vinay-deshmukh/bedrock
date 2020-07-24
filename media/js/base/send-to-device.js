@@ -96,27 +96,29 @@ if (typeof window.Mozilla === 'undefined') {
         this.formTimeout = setTimeout(self.updateMessaging, 5000);
 
         console.log('fetch call');
-        console.log(Promise.prototype.finally);
         window.fetch('/country-code.json')
             .then(function(data) {
                 console.log('then begin');
+                
                 if (data && data.country_code) {
                     SendToDevice.COUNTRY_CODE = data.country_code.toLowerCase();
                 }
                 self.updateMessaging();
                 console.log('then end');
             })
-            .catch(function() {
+            .catch(function(x) {
                 // something went wrong, show only the email messaging.
+                console.log('catch begin');
                 self.updateMessaging();
+                console.log('catch end');
+            })
+            .then(function() {
+                console.log('finally begin');
+                if (typeof self.geoCallback === 'function') {
+                    self.geoCallback(SendToDevice.COUNTRY_CODE);
+                }
+                console.log('finally end');
             });
-            // .finally(function() {
-            //     console.log('finally begin');
-            //     // if (typeof self.geoCallback === 'function') {
-            //     //     self.geoCallback(SendToDevice.COUNTRY_CODE);
-            //     // }
-            //     console.log('finally end');
-            // });
     };
 
     /**
@@ -133,7 +135,6 @@ if (typeof window.Mozilla === 'undefined') {
      */
     SendToDevice.prototype.updateMessaging = function() {
         console.log('updateMessaging start');
-        console.log('Country code:' + SendToDevice.COUNTRY_CODE);
         clearTimeout(this.formTimeout);
         if (!this.formLoaded) {
             this.formLoaded = true;

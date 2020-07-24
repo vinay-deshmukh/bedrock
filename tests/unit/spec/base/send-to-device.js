@@ -53,6 +53,7 @@ describe('send-to-device.js', function() {
         $('#send-to-device').remove();
         Mozilla.SendToDevice.COUNTRY_CODE = '';
     });
+/*
     //works
     describe('instantiation', function() {
 
@@ -79,39 +80,40 @@ describe('send-to-device.js', function() {
             expect(form.inSupportedCountry()).toBeTruthy();
         });
     });
-
+*/
     describe('getLocation', function() {
+
+        beforeEach(function() {
+            jasmine.clock().install();
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
+        });
 
         it('should call bedrock geo to update the messaging', function() {
             console.log('getLocation test starts');
             // spyOn($, 'get').and.callFake(function () {
-            // var self = this;
-            // self.resetSpy = function(){
-            //     self.tempSpy.and.callThrough();
-            // };
-            // self.tempSpy = 
-            spyOn(window, 'fetch').and.callFake(function() {
+            spyOn(window, 'fetch').and.callFake(function () {
                 var d = $.Deferred();
                 var data = {
                     country_code: 'us'
                 };
-                console.log('fake fetch returns');
-                d.resolve(data);//, 'success');
+                d.resolve(data, 'success');
                 return d.promise();
-
-                // return Promise.resolve(data);
-
-            //     // Remove callFake
-                // self.resetSpy();
-
-                // return d.promise();
             });
 
             spyOn(form, 'updateMessaging').and.callThrough();
             console.log('start form init');
             
+            // jasmine.clock().install();
+
             form.init();
             console.log('form init after');
+
+            // Wait for the fetch().then() to execute
+            jasmine.clock().tick(6000);
+            console.log('6000 ms later...')
 
             // spyOn($, 'get');
             // expect($.get).toHaveBeenCalledWith('/country-code.json');
@@ -121,7 +123,7 @@ describe('send-to-device.js', function() {
             console.log('test:' + Mozilla.SendToDevice.COUNTRY_CODE);
             expect(Mozilla.SendToDevice.COUNTRY_CODE).toEqual('us');
 
-
+            // jasmine.clock().uninstall();
         });
     });
 /*
