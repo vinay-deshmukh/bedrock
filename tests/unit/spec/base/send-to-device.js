@@ -113,7 +113,7 @@ describe('send-to-device.js', function() {
 
             // Wait for the fetch().then() to execute
             jasmine.clock().tick(6000);
-            console.log('6000 ms later...')
+            console.log('6000 ms later...');
 
             // spyOn($, 'get');
             // expect($.get).toHaveBeenCalledWith('/country-code.json');
@@ -236,42 +236,96 @@ describe('send-to-device.js', function() {
             expect(form.checkEmailValidity(false)).toBeFalsy();
         });
     });
-/*
+
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
+            jasmine.clock().install();
             // spyOn($, 'get').and.callFake(function () {
-            spyOn(window, 'fetch').and.callFake(function () {
-                var d = $.Deferred();
-                var data = {
-                    country_code: 'us'
-                };
-                d.resolve(data);
-                return d.promise();
-            });
+            // spyOn(window, 'fetch').and.callFake(function () {
+            //     var d = $.Deferred();
+            //     var data = {
+            //         country_code: 'us'
+            //     };
+            //     d.resolve(data);
+            //     return d.promise();
+            // });
+        });
+
+        afterEach(function() {
+            jasmine.clock().uninstall();
         });
 
         it('should handle success', function() {
+            console.log('\n\nshould handle success');
 
             // spyOn($, 'post').and.callFake(function () {
-            spyOn(window, 'fetch').and.callFake(function () {
-                var d = $.Deferred();
-                var data = {
-                    'success': 'success'
-                };
-                d.resolve(data);
-                return d.promise();
-            });
+            // spyOn(window, 'fetch').and.callFake(function () {
+            //     var d = $.Deferred();
+            //     var data = {
+            //         'success': 'success'
+            //     };
+            //     d.resolve(data);
+            //     return d.promise();
+            // });
+
+
+            var first = (function() {
+                    var d = $.Deferred();
+                    var data = {
+                        country_code: 'us'
+                    };
+                    d.resolve(data);
+                    console.log('first has executed');
+                    return d.promise();
+                })();
+            var second = (function() {
+                    var d = $.Deferred();
+                    var data = {
+                        'success': 'success'
+                    };
+                    d.resolve(data);
+                    console.log('second has executed');
+                    return d.promise();
+                })();
+
+            spyOn(window, 'fetch').and.returnValues(
+                // First call is a GET request
+                first,
+                // Second call is a POST request
+                second
+                );
+            console.log('spy on fetch done');
+            
 
             spyOn(form, 'onFormSuccess').and.callThrough();
 
             form.init();
-            $('.send-to-device-form').submit();
-            // expect($.post).toHaveBeenCalled();
-            expect(window.fetch).toHaveBeenCalled();
-            expect(form.onFormSuccess).toHaveBeenCalledWith('success');
-        });
 
+            jasmine.clock().tick(6000);
+            console.log('6000ms later');
+
+            // $('.send-to-device-form').submit();
+            let cf = document.querySelector('.send-to-device-form');
+            console.log(cf.constructor.name);
+            console.log(cf.submit);
+
+            try{
+                cf.submit();
+            } catch(err){
+                console.log(err);
+            } finally{
+                console.log('try finally');
+            }
+
+            console.log('submit form done');
+            // expect($.post).toHaveBeenCalled();
+            // expect(window.fetch).toHaveBeenCalled();
+            expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
+            expect(form.onFormSuccess).toHaveBeenCalledWith('success');
+            console.log('it end');
+        });
+        /*
         it('should handle error', function() {
 
             // spyOn($, 'post').and.callFake(function () {
@@ -311,6 +365,7 @@ describe('send-to-device.js', function() {
             expect(window.fetch).toHaveBeenCalled();
             expect(form.onFormFailure).toHaveBeenCalledWith('An error occurred in our system. Please try again later.');
         });
+        */
     });
-*/
+
 });
