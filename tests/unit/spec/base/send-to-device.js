@@ -53,7 +53,7 @@ describe('send-to-device.js', function() {
         $('#send-to-device').remove();
         Mozilla.SendToDevice.COUNTRY_CODE = '';
     });
-/*
+    /*
     //works
     describe('instantiation', function() {
 
@@ -275,39 +275,53 @@ describe('send-to-device.js', function() {
 
 
             var first = (function() {
-                    var d = $.Deferred();
-                    var data = {
-                        country_code: 'us'
-                    };
-                    d.resolve(data);
-                    console.log('first has executed');
-                    return d.promise();
-                })();
+                var d = $.Deferred();
+                var data = {
+                    country_code: 'us'
+                };
+                d.resolve(data);
+                console.log('first has executed');
+                return d.promise();
+            })();
             var second = (function() {
-                    var d = $.Deferred();
-                    var data = {
-                        'success': 'success'
-                    };
-                    d.resolve(data);
-                    console.log('second has executed');
-                    return d.promise();
-                })();
+                var d = $.Deferred();
+                var data = {
+                    'success': 'success'
+                };
+                d.resolve(data);
+                console.log('second has executed');
+                return d.promise();
+            })();
 
             spyOn(window, 'fetch').and.returnValues(
                 // First call is a GET request
                 first,
                 // Second call is a POST request
                 second
-                );
+            );
             console.log('spy on fetch done');
             
 
             spyOn(form, 'onFormSuccess').and.callThrough();
 
             form.init();
+            console.log('after form init');
 
             // jasmine.clock().tick(6000);
             // console.log('6000ms later');
+
+            var q = [];
+            for(var fe in $('.send-to-device-form').elements) {
+                console.log(fe);
+                if(fe.name) {
+                    q.push(fe.name + '=' + encodeURIComponent(fe.value));
+                }
+            }
+            var formData = q.join('&');
+
+            console.log('rough:' + formData);
+            console.log('jQuery:' + $('.send-to-device-form').serialize());
+
 
             // $('.send-to-device-form').submit();
             var cf = document.querySelector('.send-to-device-form');
@@ -317,8 +331,9 @@ describe('send-to-device.js', function() {
 
             try{
                 console.log('try: before hit submit');
-                cf.submit();
-                console.log('try: after hit submit')
+                // cf.submit();
+                cf.requestSubmit();
+                console.log('try: after hit submit');
             } catch(err){
                 console.log('catch: before err print');
                 console.log(err);

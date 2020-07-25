@@ -9,7 +9,7 @@ if (typeof window.Mozilla === 'undefined') {
     window.Mozilla = {};
 }
 
-(function($) {
+(function() {
     'use strict';
 
     var SendToDevice = function(id) {
@@ -106,7 +106,7 @@ if (typeof window.Mozilla === 'undefined') {
                 self.updateMessaging();
                 console.log('then end');
             })
-            .catch(function(x) {
+            .catch(function() {
                 // something went wrong, show only the email messaging.
                 console.log('catch begin');
                 self.updateMessaging();
@@ -170,6 +170,8 @@ if (typeof window.Mozilla === 'undefined') {
     SendToDevice.prototype.bindEvents = function() {
         console.log('bindEvents begin');
         // this.$form.on('submit', $.proxy(this.onFormSubmit, this));
+        // $('.send-to-device-form').on('submit', $.proxy(this.onFormSubmit, this));
+
         this.$form.addEventListener('submit', this.onFormSubmit.bind(this));
 
         // TODO: test file does not have this
@@ -181,6 +183,7 @@ if (typeof window.Mozilla === 'undefined') {
      * Remove all form event handlers
      */
     SendToDevice.prototype.unbindEvents = function() {
+        console.log('unbindEvents begin');
         // TODO: ask about removeEventListener
         // this.$form.off('submit');
         // this.$form.removeEventListener('submit');
@@ -188,6 +191,7 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$footerLinks.removeEventListener('click');
         // this.$sendAnotherLink.off('click');
         // this.$sendAnotherLink.removeEventListener('click');
+        console.log('unbindEvents end');
     };
 
     /**
@@ -230,7 +234,8 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$form.addClass('loading');
         this.$form.classList.add('loading');
 
-        this.spinner.spin(this.$spinnerTarget.show()[0]);
+        // TODO:
+        // this.spinner.spin(this.$spinnerTarget.show()[0]);
     };
 
     /**
@@ -251,19 +256,35 @@ if (typeof window.Mozilla === 'undefined') {
 
         var self = this;
         var action = this.$form.getAttribute('action');
-        var formData = this.$form.serialize();
+        // var formData = this.$form.serialize();
+        // var formData = $('.send-to-device-form').serialize();
+        // var formData = new FormData(this.$form);
+
+        // Rough implementation of jQuery.serialize()
+        var q = [];
+        for(var fe in this.$form.elements) {
+            if(fe.name) {
+                q.push(fe.name + '=' + encodeURIComponent(fe.value));
+            }
+        }
+        var formData = q.join('&');
+        console.log('formData string:');
+        console.log(formData);
+
+        console.log('form is serialized');
 
         this.disableForm();
 
         // if we know the user has not been prompted to enter an SMS number,
         // perform some basic email validation before submitting the form.
-        if (!this.smsEnabled && !this.checkEmailValidity(this.$input.val())) {
+        if (!this.smsEnabled && !this.checkEmailValidity(this.$input.value)) {
             this.onFormError(['email']);
             return;
         }
 
         if (SendToDevice.COUNTRY_CODE) {
             formData += '&country=' + SendToDevice.COUNTRY_CODE;
+            // formData.append("country", SendToDevice.COUNTRY_CODE);
         }
 
         // else POST and let the server work out whether the input is a
@@ -282,21 +303,23 @@ if (typeof window.Mozilla === 'undefined') {
 
         window.fetch(action, {
             method: 'POST',
-            body: JSON.stringify(formData),
+            body: formData,
+            // body: JSON.stringify(formData),
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            }
+            },
+            // redirect: 'follow',
         // }).then(
             // (data) => { return data.json();
         }).then(function(data) {
             data = data.json();
-                if (data.success) {
-                    self.onFormSuccess(data.success);
-                } else if (data.errors) {
-                    self.onFormError(data.errors);
-                }
+            if (data.success) {
+                self.onFormSuccess(data.success);
+            } else if (data.errors) {
+                self.onFormError(data.errors);
+            }
         }).catch(function(error) {
-                self.onFormFailure(error);
+            self.onFormFailure(error);
         });
 
         console.log('onFormSubmit end');
@@ -327,8 +350,8 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$errorList.find('li').hide();
         this.$errorList.querySelectorAll('li')
             .forEach(function(li){
-                    li.style.display = 'none';
-        });
+                li.style.display = 'none';
+            });
 
         this.$errorList.classList.remove('hidden');
 
@@ -346,7 +369,7 @@ if (typeof window.Mozilla === 'undefined') {
         this.$errorList.querySelectorAll(errorClass)
             .forEach(function(eClass){
                 eClass.style.display = '';
-        });
+            });
         this.enableForm();
     };
 
@@ -354,14 +377,14 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$errorList.find('li').hide();
         this.$errorList.querySelectorAll('li')
             .forEach(function(li){
-                    li.style.display = 'none';
-        });
+                li.style.display = 'none';
+            });
         this.$errorList.classList.remove('hidden');
         // this.$errorList.find('.system').show();
         this.$errorList.querySelectorAll('.system')
             .forEach(function(sysEle){
-                    sysEle.style.display = '';
-        });
+                sysEle.style.display = '';
+            });
         this.enableForm();
     };
 
