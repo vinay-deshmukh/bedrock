@@ -246,6 +246,7 @@ if (typeof window.Mozilla === 'undefined') {
      * Handle form submission via XHR
      */
     SendToDevice.prototype.onFormSubmit = function(e) {
+        console.log('onFormSubmit begin');
         e.preventDefault();
 
         var self = this;
@@ -298,7 +299,7 @@ if (typeof window.Mozilla === 'undefined') {
                 self.onFormFailure(error);
         });
 
-
+        console.log('onFormSubmit end');
     };
 
     SendToDevice.prototype.onFormSuccess = function() {
