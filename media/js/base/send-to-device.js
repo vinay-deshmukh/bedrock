@@ -217,18 +217,21 @@ if (typeof window.Mozilla === 'undefined') {
      * Enable form fields and hide loading indicator
      */
     SendToDevice.prototype.enableForm = function() {
+        console.log('enableForm begin');
         // this.$input.prop('disabled', false);
         this.$input.disabled = false;
         // this.$form.removeClass('loading');
         this.$form.classList.remove('loading');
         // this.$spinnerTarget.hide();
         this.$spinnerTarget.style.display = 'none';
+        console.log('enableForm end');
     };
 
     /**
      * Disable form fields and show loading indicator
      */
     SendToDevice.prototype.disableForm = function() {
+        console.log('disableForm begin');
         // this.$input.prop('disabled', true);
         this.$input.disabled = true;
         // this.$form.addClass('loading');
@@ -236,6 +239,7 @@ if (typeof window.Mozilla === 'undefined') {
 
         // TODO:
         // this.spinner.spin(this.$spinnerTarget.show()[0]);
+        console.log('disableForm end');
     };
 
     /**
@@ -253,16 +257,22 @@ if (typeof window.Mozilla === 'undefined') {
     SendToDevice.prototype.onFormSubmit = function(e) {
         console.log('onFormSubmit begin');
         e.preventDefault();
+        console.log('preventDefault');
 
         var self = this;
         var action = this.$form.getAttribute('action');
         // var formData = this.$form.serialize();
         // var formData = $('.send-to-device-form').serialize();
         // var formData = new FormData(this.$form);
+        console.log('action:' + action);
 
         // Rough implementation of jQuery.serialize()
+        console.log('start formdata creation');
         var q = [];
-        for(var fe in this.$form.elements) {
+        var fi, fe;
+        for(fi = 0; fi < this.$form.elements.length; fi++) {
+            fe = this.$form.elements[fi];
+            console.log('fe:' + fe);
             if(fe.name) {
                 q.push(fe.name + '=' + encodeURIComponent(fe.value));
             }
@@ -287,6 +297,7 @@ if (typeof window.Mozilla === 'undefined') {
             // formData.append("country", SendToDevice.COUNTRY_CODE);
         }
 
+        console.log('now sending POST');
         // else POST and let the server work out whether the input is a
         // valid email address or US phone number.
         // $.post(action, formData)
@@ -301,6 +312,10 @@ if (typeof window.Mozilla === 'undefined') {
         //         self.onFormFailure(error);
         //     });
 
+        // Same
+        console.log('this.onFormSuccess:' + this.onFormSuccess);
+        console.log('self.onFormSuccess:' + self.onFormSuccess);
+
         window.fetch(action, {
             method: 'POST',
             body: formData,
@@ -309,32 +324,77 @@ if (typeof window.Mozilla === 'undefined') {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             },
             // redirect: 'follow',
-        // }).then(
-            // (data) => { return data.json();
+        }).then((data)=> { 
+            console.log('handle json conversion');
+            console.log('data:' + data);
+            console.log('data.json():' + data.json);
+            var djson = data.json()
+            
+            console.log('data is now json');
+            console.log('data:' + data);
+            console.log('data.then:' + data.then);
+            console.log('djson:' + djson);
+            console.log('djson.then:' + djson.then);
+
+            return djson;
+        // }).then((data) => {
         }).then(function(data) {
-            data = data.json();
-            if (data.success) {
-                self.onFormSuccess(data.success);
-            } else if (data.errors) {
-                self.onFormError(data.errors);
-            }
+                console.log('post then begin');
+                console.log(data);
+                // console.log('this:' + this.constructor.name);
+                if (data.success) {
+                    console.log('data.success:' + data.success);
+                    // console.log('this.onFormSuccess:' + this.onFormSuccess);
+                    console.log('self.onFormSuccess:' + self.onFormSuccess);
+                    console.log('call onFormSuccess');
+                    self.onFormSuccess(data.success);
+                } else if (data.errors) {
+                    console.log('call onFormError');
+                    self.onFormError(data.errors);
+                } 
+                else {
+                    //TODO remove
+                    console.log('data did not have success or error');
+                }
+                console.log('post then end');
         }).catch(function(error) {
+            console.log('post catch');
+            console.log(error);
             self.onFormFailure(error);
+        }).then(function(){
+            console.log('post finally');
         });
 
         console.log('onFormSubmit end');
     };
 
-    SendToDevice.prototype.onFormSuccess = function() {
+    SendToDevice.prototype.onFormSuccess = function(x) {
+        console.log('onFormSuccess begin');
+        console.log('arg:' + x);
+        console.log('typeof arg:' + typeof x);
+
+
         // this.$errorList.addClass('hidden');
         this.$errorList.classList.add('hidden');
+        console.log('errorList hidden');
+
         // this.$formFields.addClass('hidden');
         this.$formFields.classList.add('hidden');
+        console.log('formFields hidden');
+
         // this.$formHeading.addClass('hidden');
-        this.$formHeading.classList.add('hidden');
+        if(this.$formHeading) {
+            console.log('formHeading exists');
+            this.$formHeading.classList.add('hidden');
+            console.log('formHeading hidden');
+        }
+        
         // this.$thankyou.removeClass('hidden');
         this.$thankyou.classList.remove('hidden');
+        console.log('onFormSuccess hid stuff');
+
         this.enableForm();
+        console.log('onFormSuccess enabled form');
 
         // track signup type in GA
         var isEmail = this.checkEmailValidity(this.$input.value);
@@ -343,9 +403,11 @@ if (typeof window.Mozilla === 'undefined') {
             'event': 'send-to-device-success',
             'input': isEmail ? 'email-address' : 'phone-number'
         });
+        console.log('onFormSuccess end');
     };
 
     SendToDevice.prototype.onFormError = function(errors) {
+        console.log('onFormError begin');
         var errorClass;
         // this.$errorList.find('li').hide();
         this.$errorList.querySelectorAll('li')
@@ -371,9 +433,11 @@ if (typeof window.Mozilla === 'undefined') {
                 eClass.style.display = '';
             });
         this.enableForm();
+        console.log('onFormError end');
     };
 
     SendToDevice.prototype.onFormFailure = function() {
+        console.log('onFormFailure begin');
         // this.$errorList.find('li').hide();
         this.$errorList.querySelectorAll('li')
             .forEach(function(li){
@@ -386,6 +450,7 @@ if (typeof window.Mozilla === 'undefined') {
                 sysEle.style.display = '';
             });
         this.enableForm();
+        console.log('onFormFailure end');
     };
 
     window.Mozilla.SendToDevice = SendToDevice;

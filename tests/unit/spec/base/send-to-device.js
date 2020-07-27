@@ -240,28 +240,24 @@ describe('send-to-device.js', function() {
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
-            // jasmine.clock().install();
-            // spyOn($, 'get').and.callFake(function () {
-            // spyOn(window, 'fetch').and.callFake(function () {
-            //     var d = $.Deferred();
-            //     var data = {
-            //         country_code: 'us'
-            //     };
-            //     d.resolve(data);
-            //     return d.promise();
-            // });
+            jasmine.clock().install();
+            this.firstGetCall = function(){
+                var d = $.Deferred();
+                var data = {
+                    country_code: 'us'
+                };
+                d.resolve(data);
+                console.log('first has executed');
+                return d.promise();
+            };
         });
 
         afterEach(function() {
-            // jasmine.clock().uninstall();
+            jasmine.clock().uninstall();
         });
 
         fit('should handle success', function() {
             console.log('\n\nshould handle success');
-
-            // hile(true){
-            //     ;
-            // }
 
             // spyOn($, 'post').and.callFake(function () {
             // spyOn(window, 'fetch').and.callFake(function () {
@@ -274,54 +270,73 @@ describe('send-to-device.js', function() {
             // });
 
 
-            var first = (function() {
-                var d = $.Deferred();
-                var data = {
-                    country_code: 'us'
-                };
-                d.resolve(data);
-                console.log('first has executed');
-                return d.promise();
-            })();
-            var second = (function() {
+            // var first = (function() {
+            //     var d = $.Deferred();
+            //     var data = {
+            //         country_code: 'us'
+            //     };
+            //     d.resolve(data);
+            //     console.log('first has executed');
+            //     return d.promise();
+            // })();
+            var second = function() {
                 var d = $.Deferred();
                 var data = {
                     'success': 'success'
+                    // 'success': true
                 };
                 d.resolve(data);
                 console.log('second has executed');
-                return d.promise();
-            })();
+                // var pd =  d.promise();
+                
+                var pd = Promise.resolve(
+                    new Response(
+                        new Blob([JSON.stringify(data)])
+                        )
+                    );
 
-            spyOn(window, 'fetch').and.returnValues(
-                // First call is a GET request
-                first,
-                // Second call is a POST request
-                second
-            );
+
+                // console.log(pd.then);
+                // done();
+                console.log('done run');
+                
+                return pd;//.then((s)=>{return s;});
+            };
+            console.log('before spy on fetch');
+            // spyOn(window, 'fetch').and.returnValues(
+            //     // First call is a GET request
+            //     // first,
+            //     this.firstGetCall(),
+            //     // Second call is a POST request
+            //     second()
+            // );
+            var fetchSpy = spyOn(window, 'fetch');
+            fetchSpy.and.callFake(this.firstGetCall);
             console.log('spy on fetch done');
             
 
+            console.log('before: form.onFormSuccess:' + form.onFormSuccess);
             spyOn(form, 'onFormSuccess').and.callThrough();
+            console.log('after:  form.onFormSuccess:' + form.onFormSuccess);
 
             form.init();
             console.log('after form init');
 
-            // jasmine.clock().tick(6000);
-            // console.log('6000ms later');
+            jasmine.clock().tick(6000);
+            console.log('6000ms later');
 
-            var q = [];
-            for(var fe in $('.send-to-device-form').elements) {
-                console.log(fe);
-                if(fe.name) {
-                    q.push(fe.name + '=' + encodeURIComponent(fe.value));
-                }
-            }
-            var formData = q.join('&');
+            // var q = [];
+            // for(var fe in $('.send-to-device-form').elements) {
+            //     console.log(fe);
+            //     if(fe.name) {
+            //         q.push(fe.name + '=' + encodeURIComponent(fe.value));
+            //     }
+            // }
+            // var formData = q.join('&');
 
-            console.log('rough:' + formData);
-            console.log('jQuery:' + $('.send-to-device-form').serialize());
-
+            // console.log('rough:' + formData);
+            // console.log('jQuery:' + $('.send-to-device-form').serialize());
+            fetchSpy.and.callFake(second);
 
             // $('.send-to-device-form').submit();
             var cf = document.querySelector('.send-to-device-form');
@@ -329,10 +344,26 @@ describe('send-to-device.js', function() {
             console.log(cf.submit);
             console.log(cf.onsubmit);
 
+            var inputEmailPhone = document.getElementById('send-to-device-input');
+            inputEmailPhone.value = "abc@def.com";
+
             try{
                 console.log('try: before hit submit');
+                // Actually submits the form
                 // cf.submit();
-                cf.requestSubmit();
+                
+
+                cf.requestSubmit(); // Tries to validate the input,
+                
+                // Does not attempt to validate, and actually submits the form
+                // cf.dispatchEvent(new Event('submit'));
+                jasmine.clock().tick(60000);
+
+                // eventHandler runs, but gives "ERROR:"
+                // const event = new Event('submit');
+                // var cancel = !cf.dispatchEvent(event);
+                // console.log('cancel:' + cancel);
+
                 console.log('try: after hit submit');
             } catch(err){
                 console.log('catch: before err print');
@@ -345,32 +376,52 @@ describe('send-to-device.js', function() {
             console.log('submit form done');
             // expect($.post).toHaveBeenCalled();
             // expect(window.fetch).toHaveBeenCalled();
-            // expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
-            // expect(form.onFormSuccess).toHaveBeenCalledWith('success');
+            expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
+            expect(form.onFormSuccess).toHaveBeenCalled(); // TODO: remove
+            // expect(form.bindEvents).toHaveBeenCalled(); // TODO: remove
+            expect(form.onFormSuccess).toHaveBeenCalledWith('success');
+
+
             console.log('it end');
         });
-        /*
-        it('should handle error', function() {
+        
+        // it('should handle error', function() {
 
-            // spyOn($, 'post').and.callFake(function () {
-            spyOn(window, 'fetch').and.callFake(function () {
-                var d = $.Deferred();
-                var data = {
-                    'errors': 'Please enter an email address.'
-                };
-                d.resolve(data);
-                return d.promise();
-            });
+        //     // spyOn($, 'post').and.callFake(function () {
+        //     // spyOn(window, 'fetch').and.callFake(function () {
+        //     //     var d = $.Deferred();
+        //     //     var data = {
+        //     //         'errors': 'Please enter an email address.'
+        //     //     };
+        //     //     d.resolve(data);
+        //     //     return d.promise();
+        //     // });
+        //     spyOn(window, 'fetch').and.returnValues(
+        //         //get
+        //         this.firstGetCall(),
+        //         //post
+        //         (function () {
+        //             var d = $.Deferred();
+        //             var data = {
+        //                 'errors': 'Please enter an email address.'
+        //             };
+        //             d.resolve(data);
+        //             return d.promise();
+        //         })()
+        //         );
 
-            spyOn(form, 'onFormError').and.callThrough();
+        //     spyOn(form, 'onFormError').and.callThrough();
 
-            form.init();
-            $('.send-to-device-form').submit();
-            // expect($.post).toHaveBeenCalled();
-            expect(window.fetch).toHaveBeenCalled();
-            expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
-        });
+        //     form.init();
+        //     // $('.send-to-device-form').submit();
+        //     document.querySelector('.send-to-device-form').requestSubmit();
 
+        //     // expect($.post).toHaveBeenCalled();
+        //     // expect(window.fetch).toHaveBeenCalled();
+        //     expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
+        //     expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
+        // });
+/*
         it('should handle failure', function() {
 
             // spyOn($, 'post').and.callFake(function () {
