@@ -351,6 +351,7 @@ if (typeof window.Mozilla === 'undefined') {
                     // this.onFormSuccess(data.success);
                 } else if (data.errors) {
                     console.log('call onFormError');
+                    console.log('data.errors:' + data.errors);
                     self.onFormError(data.errors);
                 } 
                 else {

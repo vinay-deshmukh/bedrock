@@ -256,7 +256,7 @@ describe('send-to-device.js', function() {
             // jasmine.clock().uninstall();
         });
 
-        fit('should handle success', async function(done) {
+        it('should handle success', async function(done) {
             console.log('\n\nshould handle success');
             // var first = (function() {
             //     var d = $.Deferred();
@@ -306,14 +306,10 @@ describe('send-to-device.js', function() {
             form.init();
             console.log('after form init');
 
-            // jasmine.clock().tick(6000);
-            // console.log('6000ms later');
 
             fetchSpy.and.callFake(second);
 
-            // $('.send-to-device-form').submit();
             var cf = document.querySelector('.send-to-device-form');
-            // var cf = form.$form;
             console.log(cf.constructor.name);
             console.log(cf.submit);
             console.log(cf.onsubmit);
@@ -323,18 +319,8 @@ describe('send-to-device.js', function() {
 
             try{
                 console.log('try: before hit submit');
-                // Actually submits the form
-                // cf.submit();
-                
 
-                cf.requestSubmit(); // Tries to validate the input,
-                // Does not attempt to validate, and actually submits the form
-                // cf.dispatchEvent(new Event('submit'));
-
-                // eventHandler runs, but gives "ERROR:"
-                // const event = new Event('submit');
-                // var cancel = !cf.dispatchEvent(event);
-                // console.log('cancel:' + cancel);
+                cf.requestSubmit();
 
                 console.log('try: after hit submit');
             } catch(err){
@@ -360,70 +346,132 @@ describe('send-to-device.js', function() {
                 expect(form.onFormSuccess).toHaveBeenCalledWith('success');
                 done();
                 console.log('done run in expecting');
-            }, 500);
-            
-
-            
+            }, 100);
 
             console.log('it end');
-        }, 10000);
+        });
         
-        // it('should handle error', function() {
-
-        //     // spyOn($, 'post').and.callFake(function () {
-        //     // spyOn(window, 'fetch').and.callFake(function () {
-        //     //     var d = $.Deferred();
-        //     //     var data = {
-        //     //         'errors': 'Please enter an email address.'
-        //     //     };
-        //     //     d.resolve(data);
-        //     //     return d.promise();
-        //     // });
-        //     spyOn(window, 'fetch').and.returnValues(
-        //         //get
-        //         this.firstGetCall(),
-        //         //post
-        //         (function () {
-        //             var d = $.Deferred();
-        //             var data = {
-        //                 'errors': 'Please enter an email address.'
-        //             };
-        //             d.resolve(data);
-        //             return d.promise();
-        //         })()
-        //         );
-
-        //     spyOn(form, 'onFormError').and.callThrough();
-
-        //     form.init();
-        //     // $('.send-to-device-form').submit();
-        //     document.querySelector('.send-to-device-form').requestSubmit();
-
-        //     // expect($.post).toHaveBeenCalled();
-        //     // expect(window.fetch).toHaveBeenCalled();
-        //     expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
-        //     expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
-        // });
-/*
-        it('should handle failure', function() {
+        it('should handle error', function(done) {
+            console.log('\n\n\nshould handle error');
 
             // spyOn($, 'post').and.callFake(function () {
-            spyOn(window, 'fetch').and.callFake(function () {
+            // spyOn(window, 'fetch').and.callFake(function () {
+            //     var d = $.Deferred();
+            //     var data = {
+            //         'errors': 'Please enter an email address.'
+            //     };
+            //     d.resolve(data);
+            //     return d.promise();
+            // });
+            // spyOn(window, 'fetch');.and.returnValues(
+            //     //get
+            //     this.firstGetCall(),
+            //     //post
+            //     (function () {
+            //         var d = $.Deferred();
+            //         var data = {
+            //             'errors': 'Please enter an email address.'
+            //         };
+            //         d.resolve(data);
+            //         return d.promise();
+            //     })()
+            //     );
+
+            var fetchSpy = spyOn(window, 'fetch');
+            fetchSpy.and.callFake(this.firstGetCall);
+
+
+
+            spyOn(form, 'onFormError').and.callThrough();
+
+            form.init();
+            var second = function() {
                 var d = $.Deferred();
-                var error = 'An error occurred in our system. Please try again later.';
-                d.reject(error);
-                return d.promise();
-            });
+                var data = {
+                    'errors': 'Please enter an email address.'
+                };
+                d.resolve(data);
+                console.log('second has executed');
+                // var pd =  d.promise();
+                
+                var pd = Promise.resolve(
+                    new Response(
+                        new Blob([JSON.stringify(data)])
+                        )
+                    );
+                return pd;//.then((s)=>{return s;});
+            };
+            fetchSpy.and.callFake(second);
+            var inputEmailPhone = document.getElementById('send-to-device-input');
+            inputEmailPhone.value = "abc@def.com";
+
+
+            // $('.send-to-device-form').submit();
+            document.querySelector('.send-to-device-form').requestSubmit();
+
+
+            // expect($.post).toHaveBeenCalled();
+            // expect(window.fetch).toHaveBeenCalled();
+            setTimeout(function(){
+                expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
+                expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
+                done();
+            }, 100);
+            
+
+        });
+
+        fit('should handle failure', function(done) {
+
+            // spyOn($, 'post').and.callFake(function () {
+            // spyOn(window, 'fetch').and.callFake(function () {
+            //     var d = $.Deferred();
+            //     var error = 'An error occurred in our system. Please try again later.';
+            //     d.reject(error);
+            //     return d.promise();
+            // });
+
+            var fetchSpy = spyOn(window, 'fetch');
+            fetchSpy.and.callFake(this.firstGetCall);
 
             spyOn(form, 'onFormFailure').and.callThrough();
 
             form.init();
-            $('.send-to-device-form').submit();
+            var second = function() {
+                var d = $.Deferred();
+                var error = 'An error occurred in our system. Please try again later.';
+                // d.reject(error);
+                // return d.promise();
+                
+                var pd = Promise.reject(
+                    error
+                    );
+
+                
+                return pd;//.then((s)=>{return s;});
+            };
+            fetchSpy.and.callFake(second);
+
+            var inputEmailPhone = document.getElementById('send-to-device-input');
+            inputEmailPhone.value = "abc@def.com";
+
+            document.querySelector('.send-to-device-form').requestSubmit();
             // expect($.post).toHaveBeenCalled();
-            expect(window.fetch).toHaveBeenCalled();
-            expect(form.onFormFailure).toHaveBeenCalledWith('An error occurred in our system. Please try again later.');
+
+            setTimeout(function(){
+                expect(window.fetch).toHaveBeenCalled();
+                expect(form.onFormFailure).toHaveBeenCalledWith('An error occurred in our system. Please try again later.');
+
+                var fs = form.onFormFailure.calls.allArgs();
+                console.log('form.onFormFailure args:' + fs);
+
+                console.log('\n\nexpect failure done');
+                done();
+            }, 100);
+
+            
         });
-        */
+        
     });
 
 });
