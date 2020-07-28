@@ -421,7 +421,7 @@ describe('send-to-device.js', function() {
 
         });
 
-        fit('should handle failure', function(done) {
+        it('should handle failure', function(done) {
 
             // spyOn($, 'post').and.callFake(function () {
             // spyOn(window, 'fetch').and.callFake(function () {
