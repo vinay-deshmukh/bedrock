@@ -240,7 +240,7 @@ describe('send-to-device.js', function() {
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
-            jasmine.clock().install();
+            // jasmine.clock().install();
             this.firstGetCall = function(){
                 var d = $.Deferred();
                 var data = {
@@ -253,23 +253,11 @@ describe('send-to-device.js', function() {
         });
 
         afterEach(function() {
-            jasmine.clock().uninstall();
+            // jasmine.clock().uninstall();
         });
 
-        fit('should handle success', function() {
+        fit('should handle success', async function(done) {
             console.log('\n\nshould handle success');
-
-            // spyOn($, 'post').and.callFake(function () {
-            // spyOn(window, 'fetch').and.callFake(function () {
-            //     var d = $.Deferred();
-            //     var data = {
-            //         'success': 'success'
-            //     };
-            //     d.resolve(data);
-            //     return d.promise();
-            // });
-
-
             // var first = (function() {
             //     var d = $.Deferred();
             //     var data = {
@@ -295,10 +283,6 @@ describe('send-to-device.js', function() {
                         )
                     );
 
-
-                // console.log(pd.then);
-                // done();
-                console.log('done run');
                 
                 return pd;//.then((s)=>{return s;});
             };
@@ -322,24 +306,14 @@ describe('send-to-device.js', function() {
             form.init();
             console.log('after form init');
 
-            jasmine.clock().tick(6000);
-            console.log('6000ms later');
+            // jasmine.clock().tick(6000);
+            // console.log('6000ms later');
 
-            // var q = [];
-            // for(var fe in $('.send-to-device-form').elements) {
-            //     console.log(fe);
-            //     if(fe.name) {
-            //         q.push(fe.name + '=' + encodeURIComponent(fe.value));
-            //     }
-            // }
-            // var formData = q.join('&');
-
-            // console.log('rough:' + formData);
-            // console.log('jQuery:' + $('.send-to-device-form').serialize());
             fetchSpy.and.callFake(second);
 
             // $('.send-to-device-form').submit();
             var cf = document.querySelector('.send-to-device-form');
+            // var cf = form.$form;
             console.log(cf.constructor.name);
             console.log(cf.submit);
             console.log(cf.onsubmit);
@@ -354,10 +328,8 @@ describe('send-to-device.js', function() {
                 
 
                 cf.requestSubmit(); // Tries to validate the input,
-                
                 // Does not attempt to validate, and actually submits the form
                 // cf.dispatchEvent(new Event('submit'));
-                jasmine.clock().tick(60000);
 
                 // eventHandler runs, but gives "ERROR:"
                 // const event = new Event('submit');
@@ -376,14 +348,25 @@ describe('send-to-device.js', function() {
             console.log('submit form done');
             // expect($.post).toHaveBeenCalled();
             // expect(window.fetch).toHaveBeenCalled();
-            expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
-            expect(form.onFormSuccess).toHaveBeenCalled(); // TODO: remove
-            // expect(form.bindEvents).toHaveBeenCalled(); // TODO: remove
-            expect(form.onFormSuccess).toHaveBeenCalledWith('success');
+            
 
+            setTimeout(function(){
+                console.log('\n\n\nexpecting...');
+                // expect(window.fetch).toHaveBeenCalledTimes(100); // SHOULD FAIL
+                var f = window.fetch.calls.count();
+                console.log('fetch calls count:' + f);
+                expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
+                expect(form.onFormSuccess).toHaveBeenCalled(); // TODO: remove
+                expect(form.onFormSuccess).toHaveBeenCalledWith('success');
+                done();
+                console.log('done run in expecting');
+            }, 500);
+            
+
+            
 
             console.log('it end');
-        });
+        }, 10000);
         
         // it('should handle error', function() {
 

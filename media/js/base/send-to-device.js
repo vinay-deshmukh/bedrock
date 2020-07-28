@@ -341,13 +341,14 @@ if (typeof window.Mozilla === 'undefined') {
         }).then(function(data) {
                 console.log('post then begin');
                 console.log(data);
-                // console.log('this:' + this.constructor.name);
+                console.log('self:' + self.constructor.name);
                 if (data.success) {
                     console.log('data.success:' + data.success);
                     // console.log('this.onFormSuccess:' + this.onFormSuccess);
                     console.log('self.onFormSuccess:' + self.onFormSuccess);
                     console.log('call onFormSuccess');
                     self.onFormSuccess(data.success);
+                    // this.onFormSuccess(data.success);
                 } else if (data.errors) {
                     console.log('call onFormError');
                     self.onFormError(data.errors);
