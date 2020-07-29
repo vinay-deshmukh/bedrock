@@ -27,10 +27,13 @@ if (typeof window.Mozilla === 'undefined') {
         this.$thankyou = document.querySelector('.thank-you');
         this.$errorList = document.querySelector('.error-list');
         this.$spinnerTarget = document.querySelector('.loading-spinner');
-        this.$footerLinks = document.querySelector('footer > ul');
+
+        // Does not exist in macros.html
+        // TODO: remove
+        // this.$footerLinks = document.querySelector('footer > ul');
 
         // Does not exist in test file
-        //this.$sendAnotherLink = document.querySelector('.send-another');
+        this.$sendAnotherLink = document.querySelector('.send-another');
         this.$formHeading = document.querySelector('.form-heading');
 
         this.spinnerColor = this.$widget.dataset.spinnerColor || '#000';
@@ -139,7 +142,7 @@ if (typeof window.Mozilla === 'undefined') {
         if (!this.formLoaded) {
             this.formLoaded = true;
 
-            // if the page visitor is in a supportec country, show the SMS messaging / copy
+            // if the page visitor is in a supported country, show the SMS messaging / copy
             if (this.inSupportedCountry()) {
                 this.showSMS();
             }
@@ -154,7 +157,7 @@ if (typeof window.Mozilla === 'undefined') {
         console.log('showSMS begin');
         // TODO: label doesnt have any data, and original selector used class instead
         // of id
-        var $label = this.$formFields.querySelector('#form-input-label');
+        var $label = document.querySelector('#form-input-label');
         this.$form.classList.add('sms-country');
 
         // TODO: remove this?
@@ -172,10 +175,19 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$form.on('submit', $.proxy(this.onFormSubmit, this));
         // $('.send-to-device-form').on('submit', $.proxy(this.onFormSubmit, this));
 
-        this.$form.addEventListener('submit', this.onFormSubmit.bind(this));
+
+        // this.$form.addEventListener('submit', this.onFormSubmit.bind(this));
+        this.eventFormSubmit = this.onFormSubmit.bind(this);
+        this.$form.addEventListener('submit', this.eventFormSubmit);
 
         // TODO: test file does not have this
         // this.$sendAnotherLink.addEventListener('click', this.sendAnother.bind(this));
+        if(this.$sendAnotherLink) {
+            this.eventClickSendAnotherLink = this.sendAnother.bind(this);
+            this.$sendAnotherLink.addEventListener('click', this.eventClickSendAnotherLink);
+        }
+        
+
         console.log('bindEvents end');
     };
 
@@ -187,10 +199,16 @@ if (typeof window.Mozilla === 'undefined') {
         // TODO: ask about removeEventListener
         // this.$form.off('submit');
         // this.$form.removeEventListener('submit');
+        this.$form.removeEventListener('submit', this.eventFormSubmit);
+        
         // this.$footerLinks.off('click');
         // this.$footerLinks.removeEventListener('click');
+
         // this.$sendAnotherLink.off('click');
         // this.$sendAnotherLink.removeEventListener('click');
+        if(this.$sendAnotherLink) {
+            this.$sendAnotherLink.removeEventListener('click', this.eventClickSendAnotherLink);
+        }
         console.log('unbindEvents end');
     };
 
@@ -206,7 +224,10 @@ if (typeof window.Mozilla === 'undefined') {
         // this.$thankyou.addClass('hidden');
         this.$thankyou.classList.add('hidden');
         // this.$formHeading.removeClass('hidden');
-        this.$formHeading.classList.remove('hidden');
+        if(this.$formHeading) {
+            this.$formHeading.classList.remove('hidden');
+        }
+        
         // this.$formFields.removeClass('hidden');
         this.$formFields.classList.remove('hidden');
         // this.$input.trigger('focus');
@@ -269,9 +290,9 @@ if (typeof window.Mozilla === 'undefined') {
         // Rough implementation of jQuery.serialize()
         console.log('start formdata creation');
         var q = [];
-        var fi, fe;
+        var fi;
         for(fi = 0; fi < this.$form.elements.length; fi++) {
-            fe = this.$form.elements[fi];
+            var fe = this.$form.elements[fi];
             console.log('fe:' + fe);
             if(fe.name) {
                 q.push(fe.name + '=' + encodeURIComponent(fe.value));
@@ -324,11 +345,11 @@ if (typeof window.Mozilla === 'undefined') {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             },
             // redirect: 'follow',
-        }).then((data)=> { 
+        }).then(function(data) { 
             console.log('handle json conversion');
             console.log('data:' + data);
             console.log('data.json():' + data.json);
-            var djson = data.json()
+            var djson = data.json();
             
             console.log('data is now json');
             console.log('data:' + data);
@@ -339,26 +360,26 @@ if (typeof window.Mozilla === 'undefined') {
             return djson;
         // }).then((data) => {
         }).then(function(data) {
-                console.log('post then begin');
-                console.log(data);
-                console.log('self:' + self.constructor.name);
-                if (data.success) {
-                    console.log('data.success:' + data.success);
-                    // console.log('this.onFormSuccess:' + this.onFormSuccess);
-                    console.log('self.onFormSuccess:' + self.onFormSuccess);
-                    console.log('call onFormSuccess');
-                    self.onFormSuccess(data.success);
-                    // this.onFormSuccess(data.success);
-                } else if (data.errors) {
-                    console.log('call onFormError');
-                    console.log('data.errors:' + data.errors);
-                    self.onFormError(data.errors);
-                } 
-                else {
-                    //TODO remove
-                    console.log('data did not have success or error');
-                }
-                console.log('post then end');
+            console.log('post then begin');
+            console.log(data);
+            console.log('self:' + self.constructor.name);
+            if (data.success) {
+                console.log('data.success:' + data.success);
+                // console.log('this.onFormSuccess:' + this.onFormSuccess);
+                console.log('self.onFormSuccess:' + self.onFormSuccess);
+                console.log('call onFormSuccess');
+                self.onFormSuccess(data.success);
+                // this.onFormSuccess(data.success);
+            } else if (data.errors) {
+                console.log('call onFormError');
+                console.log('data.errors:' + data.errors);
+                self.onFormError(data.errors);
+            } 
+            else {
+                //TODO remove
+                console.log('data did not have success or error');
+            }
+            console.log('post then end');
         }).catch(function(error) {
             console.log('post catch');
             console.log(error);

@@ -53,7 +53,7 @@ describe('send-to-device.js', function() {
         $('#send-to-device').remove();
         Mozilla.SendToDevice.COUNTRY_CODE = '';
     });
-    /*
+    
     //works
     describe('instantiation', function() {
 
@@ -236,27 +236,41 @@ describe('send-to-device.js', function() {
             expect(form.checkEmailValidity(false)).toBeFalsy();
         });
     });
-*/
+
     describe('onFormSubmit', function() {
 
         beforeEach(function() {
             // jasmine.clock().install();
             this.firstGetCall = function(){
-                var d = $.Deferred();
+                // var d = $.Deferred();
                 var data = {
                     country_code: 'us'
                 };
-                d.resolve(data);
+                // d.resolve(data);
                 console.log('first has executed');
-                return d.promise();
+                // return d.promise();
+                var pd = window.Promise.resolve(
+                    new Response(
+                        new Blob([JSON.stringify(data)])
+                    )
+                );
+                return pd;
             };
+
+            // Specifies the delay to use in setTimeout
+            // Small values(100) work, but might fail depending on the order of how
+            // specs are run
+            // Higher values(1000) means overall test execution will take slightly longer
+            // 500 is a middle ground
+            this.timeDelayExpect = 500;
+
         });
 
         afterEach(function() {
             // jasmine.clock().uninstall();
         });
 
-        it('should handle success', async function(done) {
+        it('should handle success', function(done) {
             console.log('\n\nshould handle success');
             // var first = (function() {
             //     var d = $.Deferred();
@@ -268,20 +282,20 @@ describe('send-to-device.js', function() {
             //     return d.promise();
             // })();
             var second = function() {
-                var d = $.Deferred();
+                // var d = $.Deferred();
                 var data = {
                     'success': 'success'
                     // 'success': true
                 };
-                d.resolve(data);
+                // d.resolve(data);
                 console.log('second has executed');
                 // var pd =  d.promise();
                 
-                var pd = Promise.resolve(
+                var pd = window.Promise.resolve(
                     new Response(
                         new Blob([JSON.stringify(data)])
-                        )
-                    );
+                    )
+                );
 
                 
                 return pd;//.then((s)=>{return s;});
@@ -315,7 +329,7 @@ describe('send-to-device.js', function() {
             console.log(cf.onsubmit);
 
             var inputEmailPhone = document.getElementById('send-to-device-input');
-            inputEmailPhone.value = "abc@def.com";
+            inputEmailPhone.value = 'abc@def.com';
 
             try{
                 console.log('try: before hit submit');
@@ -346,7 +360,7 @@ describe('send-to-device.js', function() {
                 expect(form.onFormSuccess).toHaveBeenCalledWith('success');
                 done();
                 console.log('done run in expecting');
-            }, 100);
+            }, this.timeDelayExpect);
 
             console.log('it end');
         });
@@ -386,24 +400,24 @@ describe('send-to-device.js', function() {
 
             form.init();
             var second = function() {
-                var d = $.Deferred();
+                // var d = $.Deferred();
                 var data = {
                     'errors': 'Please enter an email address.'
                 };
-                d.resolve(data);
+                // d.resolve(data);
                 console.log('second has executed');
                 // var pd =  d.promise();
                 
-                var pd = Promise.resolve(
+                var pd = window.Promise.resolve(
                     new Response(
                         new Blob([JSON.stringify(data)])
-                        )
-                    );
+                    )
+                );
                 return pd;//.then((s)=>{return s;});
             };
             fetchSpy.and.callFake(second);
             var inputEmailPhone = document.getElementById('send-to-device-input');
-            inputEmailPhone.value = "abc@def.com";
+            inputEmailPhone.value = 'abc@def.com';
 
 
             // $('.send-to-device-form').submit();
@@ -416,7 +430,7 @@ describe('send-to-device.js', function() {
                 expect(window.fetch).toHaveBeenCalledTimes(2); // once for get, once for post
                 expect(form.onFormError).toHaveBeenCalledWith('Please enter an email address.');
                 done();
-            }, 100);
+            }, this.timeDelayExpect);
             
 
         });
@@ -438,14 +452,14 @@ describe('send-to-device.js', function() {
 
             form.init();
             var second = function() {
-                var d = $.Deferred();
+                // var d = $.Deferred();
                 var error = 'An error occurred in our system. Please try again later.';
                 // d.reject(error);
                 // return d.promise();
                 
-                var pd = Promise.reject(
+                var pd = window.Promise.reject(
                     error
-                    );
+                );
 
                 
                 return pd;//.then((s)=>{return s;});
@@ -453,7 +467,7 @@ describe('send-to-device.js', function() {
             fetchSpy.and.callFake(second);
 
             var inputEmailPhone = document.getElementById('send-to-device-input');
-            inputEmailPhone.value = "abc@def.com";
+            inputEmailPhone.value = 'abc@def.com';
 
             document.querySelector('.send-to-device-form').requestSubmit();
             // expect($.post).toHaveBeenCalled();
@@ -467,7 +481,7 @@ describe('send-to-device.js', function() {
 
                 console.log('\n\nexpect failure done');
                 done();
-            }, 100);
+            }, this.timeDelayExpect);
 
             
         });
