@@ -257,7 +257,7 @@ if (typeof window.Mozilla === 'undefined') {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             },
-        }).then((data)=> { 
+        }).then(function(data) { 
             return data.json();
         }).then(function(data) {
             if (data.success) {
