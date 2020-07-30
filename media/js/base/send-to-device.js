@@ -338,4 +338,3 @@ if (typeof window.Mozilla === 'undefined') {
     window.Mozilla.SendToDevice = SendToDevice;
 
 })();
-// })(window.jQuery);
