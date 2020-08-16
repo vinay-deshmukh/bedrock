@@ -57,7 +57,7 @@ if (typeof window.Mozilla === 'undefined') {
      * Initialise the form messaging and bind events.
      */
     SendToDevice.prototype.init = function() {
-        if (this.widget instanceof HTMLElement) {
+        if (this.widget) {
             this.getLocation();
             this.bindEvents();
         }
