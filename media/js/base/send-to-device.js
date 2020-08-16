@@ -20,17 +20,17 @@ if (typeof window.Mozilla === 'undefined') {
         this.formTimeout = null;
         this.smsEnabled = false;
 
-        this.$widget = document.getElementById(this.formId);
-        this.$form = document.querySelector('.send-to-device-form');
-        this.$formFields = document.querySelector('.send-to-device-form-fields');
-        this.$input = document.querySelector('.send-to-device-input');
-        this.$thankyou = document.querySelectorAll('.thank-you');
-        this.$errorList = document.querySelector('.error-list');
-        this.$spinnerTarget = document.querySelector('.loading-spinner');
-        this.$sendAnotherLink = document.querySelector('.send-another');
-        this.$formHeading = document.querySelector('.form-heading');
-        this.spinnerColor = this.$widget.dataset.spinnerColor || '#000';
-        this.countries = this.$widget.dataset.countries;
+        this.widget = document.getElementById(this.formId);
+        this.form = document.querySelector('.send-to-device-form');
+        this.formFields = document.querySelector('.send-to-device-form-fields');
+        this.input = document.querySelector('.send-to-device-input');
+        this.thankyou = document.querySelectorAll('.thank-you');
+        this.errorList = document.querySelector('.error-list');
+        this.spinnerTarget = document.querySelector('.loading-spinner');
+        this.sendAnotherLink = document.querySelector('.send-another');
+        this.formHeading = document.querySelector('.form-heading');
+        this.spinnerColor = this.widget.dataset.spinnerColor || '#000';
+        this.countries = this.widget.dataset.countries;
 
         this.spinner = new Spinner({
             lines: 12, // The number of lines to draw
@@ -57,7 +57,7 @@ if (typeof window.Mozilla === 'undefined') {
      * Initialise the form messaging and bind events.
      */
     SendToDevice.prototype.init = function() {
-        if (this.$widget instanceof HTMLElement) {
+        if (this.widget instanceof HTMLElement) {
             this.getLocation();
             this.bindEvents();
         }
@@ -135,10 +135,10 @@ if (typeof window.Mozilla === 'undefined') {
      * Updates the form fields to include SMS messaging
      */
     SendToDevice.prototype.showSMS = function() {
-        var $label = document.querySelector('.form-input-label');
-        this.$form.classList.add('sms-country');
-        $label.innerHTML = $label.dataset.alt;
-        this.$input.setAttribute('placeholder', this.$input.dataset.alt);
+        var label = document.querySelector('.form-input-label');
+        this.form.classList.add('sms-country');
+        label.innerHTML = label.dataset.alt;
+        this.input.setAttribute('placeholder', this.input.dataset.alt);
         this.smsEnabled = true;
     };
 
@@ -147,12 +147,12 @@ if (typeof window.Mozilla === 'undefined') {
      */
     SendToDevice.prototype.bindEvents = function() {
         this.eventFormSubmit = this.onFormSubmit.bind(this);
-        this.$form.addEventListener('submit', this.eventFormSubmit);
+        this.form.addEventListener('submit', this.eventFormSubmit);
 
-        if(this.$sendAnotherLink) {
+        if(this.sendAnotherLink) {
             // Check that the Element exists, as it's not present in unit test spec file
             this.eventClickSendAnotherLink = this.sendAnother.bind(this);
-            this.$sendAnotherLink.addEventListener('click', this.eventClickSendAnotherLink);
+            this.sendAnotherLink.addEventListener('click', this.eventClickSendAnotherLink);
         }
     };
 
@@ -160,11 +160,11 @@ if (typeof window.Mozilla === 'undefined') {
      * Remove all form event handlers
      */
     SendToDevice.prototype.unbindEvents = function() {
-        this.$form.removeEventListener('submit', this.eventFormSubmit);
+        this.form.removeEventListener('submit', this.eventFormSubmit);
 
-        if(this.$sendAnotherLink) {
+        if(this.sendAnotherLink) {
             // Check that the Element exists, as it's not present in unit test spec file
-            this.$sendAnotherLink.removeEventListener('click', this.eventClickSendAnotherLink);
+            this.sendAnotherLink.removeEventListener('click', this.eventClickSendAnotherLink);
         }
     };
 
@@ -173,38 +173,38 @@ if (typeof window.Mozilla === 'undefined') {
      */
     SendToDevice.prototype.sendAnother = function(e) {
         e.preventDefault();
-        this.$input.value = '';
-        this.$errorList.classList.add('hidden');
-        this.$thankyou.forEach(
+        this.input.value = '';
+        this.errorList.classList.add('hidden');
+        this.thankyou.forEach(
             function(currentValue){
                 currentValue.classList.add('hidden');
             });
 
-        if(this.$formHeading) {
+        if(this.formHeading) {
             // Check that the Element exists, as it's not present in unit test spec file
-            this.$formHeading.classList.remove('hidden');
+            this.formHeading.classList.remove('hidden');
         }
 
-        this.$formFields.classList.remove('hidden');
-        this.$input.focus();
+        this.formFields.classList.remove('hidden');
+        this.input.focus();
     };
 
     /**
      * Enable form fields and hide loading indicator
      */
     SendToDevice.prototype.enableForm = function() {
-        this.$input.disabled = false;
-        this.$form.classList.remove('loading');
-        this.$spinnerTarget.style.display = 'none';
+        this.input.disabled = false;
+        this.form.classList.remove('loading');
+        this.spinnerTarget.style.display = 'none';
     };
 
     /**
      * Disable form fields and show loading indicator
      */
     SendToDevice.prototype.disableForm = function() {
-        this.$input.disabled = true;
-        this.$form.classList.add('loading');
-        this.spinner.spin(this.$spinnerTarget);
+        this.input.disabled = true;
+        this.form.classList.add('loading');
+        this.spinner.spin(this.spinnerTarget);
     };
 
     /**
@@ -223,14 +223,14 @@ if (typeof window.Mozilla === 'undefined') {
         e.preventDefault();
 
         var self = this;
-        var action = this.$form.getAttribute('action');
+        var action = this.form.getAttribute('action');
 
         // Rough implementation of jQuery.serialize()
         // i.e. make a url-encoded string from the form fields
         var q = [];
         var fi;
-        for(fi = 0; fi < this.$form.elements.length; fi++) {
-            var fe = this.$form.elements[fi];
+        for(fi = 0; fi < this.form.elements.length; fi++) {
+            var fe = this.form.elements[fi];
             if(fe.name) {
                 q.push(fe.name + '=' + encodeURIComponent(fe.value));
             }
@@ -240,7 +240,7 @@ if (typeof window.Mozilla === 'undefined') {
 
         // if we know the user has not been prompted to enter an SMS number,
         // perform some basic email validation before submitting the form.
-        if (!this.smsEnabled && !this.checkEmailValidity(this.$input.value)) {
+        if (!this.smsEnabled && !this.checkEmailValidity(this.input.value)) {
             this.onFormError(['email']);
             return;
         }
@@ -272,16 +272,16 @@ if (typeof window.Mozilla === 'undefined') {
 
     SendToDevice.prototype.onFormSuccess = function() {
 
-        this.$errorList.classList.add('hidden');
+        this.errorList.classList.add('hidden');
 
-        this.$formFields.classList.add('hidden');
+        this.formFields.classList.add('hidden');
 
-        if(this.$formHeading) {
+        if(this.formHeading) {
             // Check that the Element exists, as it's not present in unit test spec file
-            this.$formHeading.classList.add('hidden');
+            this.formHeading.classList.add('hidden');
         }
 
-        this.$thankyou.forEach(
+        this.thankyou.forEach(
             function(currentValue){
                 currentValue.classList.remove('hidden');
             });
@@ -289,7 +289,7 @@ if (typeof window.Mozilla === 'undefined') {
         this.enableForm();
 
         // track signup type in GA
-        var isEmail = this.checkEmailValidity(this.$input.value);
+        var isEmail = this.checkEmailValidity(this.input.value);
 
         window.dataLayer.push({
             'event': 'send-to-device-success',
@@ -299,12 +299,12 @@ if (typeof window.Mozilla === 'undefined') {
 
     SendToDevice.prototype.onFormError = function(errors) {
         var errorClass;
-        this.$errorList.querySelectorAll('li')
+        this.errorList.querySelectorAll('li')
             .forEach(function(li){
                 li.style.display = 'none';
             });
 
-        this.$errorList.classList.remove('hidden');
+        this.errorList.classList.remove('hidden');
 
         if (errors.indexOf('platform') !== -1) {
             errorClass = '.system';
@@ -314,7 +314,7 @@ if (typeof window.Mozilla === 'undefined') {
             errorClass = '.email';
         }
 
-        this.$errorList.querySelectorAll(errorClass)
+        this.errorList.querySelectorAll(errorClass)
             .forEach(function(eClass){
                 eClass.style.display = '';
             });
@@ -322,13 +322,13 @@ if (typeof window.Mozilla === 'undefined') {
     };
 
     SendToDevice.prototype.onFormFailure = function() {
-        this.$errorList.querySelectorAll('li')
+        this.errorList.querySelectorAll('li')
             .forEach(function(li){
                 li.style.display = 'none';
             });
-        this.$errorList.classList.remove('hidden');
+        this.errorList.classList.remove('hidden');
 
-        this.$errorList.querySelectorAll('.system')
+        this.errorList.querySelectorAll('.system')
             .forEach(function(sysEle){
                 sysEle.style.display = '';
             });
