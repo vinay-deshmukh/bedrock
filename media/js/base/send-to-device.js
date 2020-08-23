@@ -29,8 +29,8 @@ if (typeof window.Mozilla === 'undefined') {
         this.spinnerTarget = document.querySelector('.loading-spinner');
         this.sendAnotherLink = document.querySelector('.send-another');
         this.formHeading = document.querySelector('.form-heading');
-        this.spinnerColor = this.widget.dataset.spinnerColor || '#000';
-        this.countries = this.widget.dataset.countries;
+        this.spinnerColor = this.widget.getAttribute('data-spinner-color') || '#000';
+        this.countries = this.widget.getAttribute('data-countries');
 
         this.spinner = new Spinner({
             lines: 12, // The number of lines to draw
@@ -137,8 +137,8 @@ if (typeof window.Mozilla === 'undefined') {
     SendToDevice.prototype.showSMS = function() {
         var label = document.querySelector('.form-input-label');
         this.form.classList.add('sms-country');
-        label.innerHTML = label.dataset.alt;
-        this.input.setAttribute('placeholder', this.input.dataset.alt);
+        label.innerHTML = label.getAttribute('data-alt');
+        this.input.setAttribute('placeholder', this.input.getAttribute('data-alt'));
         this.smsEnabled = true;
     };
 
