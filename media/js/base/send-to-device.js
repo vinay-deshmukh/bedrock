@@ -149,11 +149,8 @@ if (typeof window.Mozilla === 'undefined') {
         this.eventFormSubmit = this.onFormSubmit.bind(this);
         this.form.addEventListener('submit', this.eventFormSubmit);
 
-        if(this.sendAnotherLink) {
-            // Check that the Element exists, as it's not present in unit test spec file
-            this.eventClickSendAnotherLink = this.sendAnother.bind(this);
-            this.sendAnotherLink.addEventListener('click', this.eventClickSendAnotherLink);
-        }
+        this.eventClickSendAnotherLink = this.sendAnother.bind(this);
+        this.sendAnotherLink.addEventListener('click', this.eventClickSendAnotherLink);
     };
 
     /**
@@ -161,11 +158,7 @@ if (typeof window.Mozilla === 'undefined') {
      */
     SendToDevice.prototype.unbindEvents = function() {
         this.form.removeEventListener('submit', this.eventFormSubmit);
-
-        if(this.sendAnotherLink) {
-            // Check that the Element exists, as it's not present in unit test spec file
-            this.sendAnotherLink.removeEventListener('click', this.eventClickSendAnotherLink);
-        }
+        this.sendAnotherLink.removeEventListener('click', this.eventClickSendAnotherLink);
     };
 
     /**
@@ -180,11 +173,7 @@ if (typeof window.Mozilla === 'undefined') {
                 currentValue.classList.add('hidden');
             });
 
-        if(this.formHeading) {
-            // Check that the Element exists, as it's not present in unit test spec file
-            this.formHeading.classList.remove('hidden');
-        }
-
+        this.formHeading.classList.remove('hidden');
         this.formFields.classList.remove('hidden');
         this.input.focus();
     };
@@ -273,13 +262,8 @@ if (typeof window.Mozilla === 'undefined') {
     SendToDevice.prototype.onFormSuccess = function() {
 
         this.errorList.classList.add('hidden');
-
         this.formFields.classList.add('hidden');
-
-        if(this.formHeading) {
-            // Check that the Element exists, as it's not present in unit test spec file
-            this.formHeading.classList.add('hidden');
-        }
+        this.formHeading.classList.add('hidden');
 
         this.thankyou.forEach(
             function(currentValue){

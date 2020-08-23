@@ -18,6 +18,9 @@ describe('send-to-device.js', function() {
         var formMarkup = [
             '<section id="send-to-device" class="send-to-device" data-countries="|us|gb|">' +
                 '<div class="form-container">' +
+                    '<h2 class="form-heading">' +
+                        'Title text' +
+                    '</h2>' +
                     '<form class="send-to-device-form">' +
                         '<ul class="error-list hidden"></ul>' +
                         '<div class="send-to-device-form-fields">' +
@@ -28,7 +31,9 @@ describe('send-to-device.js', function() {
                                 '<button type="submit">Send</button>' +
                             '</div>' +
                         '</div>' +
-                        '<div class="thank-you hidden"></div>' +
+                        '<div class="thank-you hidden">' +
+                            '<a href="#" role="button" class="more send-another">Send Another Link</a>' +
+                        '</div>' +
                         '<div class="loading-spinner"></div>' +
                         '</form>' +
                     '</div>' +
